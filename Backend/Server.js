@@ -68,16 +68,12 @@ const upload = multer({ storage: multerStorage, limits: { fileSize: 25 * 1024 * 
 app.post("/api/host", verifyToken, upload.single("image"), async (req, res) => {
   const { name, location, totalTickets, price, date, time } = req.body;
   const email = req.userEmail;
-
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No image provided" });
     }
 
-    const file = req.file;
-    const imageBuffer = file.buffer;
-    const contentType = file.mimetype;
-
+    const { buffer, mimetype } = req.file;
     const newEvent = new Event({
       name,
       location,
@@ -85,9 +81,8 @@ app.post("/api/host", verifyToken, upload.single("image"), async (req, res) => {
       price: parseInt(price),
       date: date ? new Date(date) : null,
       time,
-      image: imageBuffer,
-      contentType,
-      hostedBy: email,
+      imageURL: "",
+      hostedBy: email, // Set the hostedBy field to the user's email
     });
 
     await newEvent.save();
@@ -103,6 +98,9 @@ app.post("/api/host", verifyToken, upload.single("image"), async (req, res) => {
 app.get("/api/events", async (req, res) => {
   try {
     const events = await Event.find();
+    if (!events) {
+      return res.status(404).json({ error: "No events found" });
+    }
     res.status(200).json(events);
   } catch (error) {
     console.error("Error fetching events:", error);
@@ -110,6 +108,8 @@ app.get("/api/events", async (req, res) => {
   }
 });
 
+
+// Route to fetch a specific event by ID
 app.get("/api/events/:id", async (req, res) => {
   const eventId = req.params.id;
   try {
@@ -124,11 +124,18 @@ app.get("/api/events/:id", async (req, res) => {
   }
 });
 
-app.post("/api/events/:id/book", async (req, res) => {
+// Route to book a ticket for an event
+app.post("/api/events/book/:id", async (req, res) => {
   try {
     const eventId = req.params.id;
     const { userEmail } = req.body;
+
+    if (!userEmail) {
+      return res.status(400).json({ error: "User email is required" });
+    }
+
     const event = await Event.findById(eventId);
+
     if (!event) {
       return res.status(404).json({ error: "Event not found" });
     }
@@ -142,17 +149,13 @@ app.post("/api/events/:id/book", async (req, res) => {
     }
 
     event.bookedBy.push(userEmail);
-    await event.save();
-
-    // You might implement additional logic here, such as creating a new booking record in another collection
-
     event.totalTickets -= 1;
     await event.save();
 
     res.status(200).json({ message: "Ticket booked successfully" });
   } catch (error) {
     console.error("Error booking tickets:", error);
-    res.status(500).json({ error: "Internal server error", message: error.message }); // Add error message to response
+    res.status(500).json({ error: "Internal server error", message: error.message });
   }
 });
 

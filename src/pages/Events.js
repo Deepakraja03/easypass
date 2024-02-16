@@ -17,14 +17,7 @@ const Events = ({ userEmail }) => {
         const response = await fetch("http://localhost:5000/api/events");
         if (response.ok) {
           const eventData = await response.json();
-          const events = eventData.events; // Access the events array within the response object
-          setEventList(events);
-          // Convert binary data to Base64 string for each event
-          const eventsWithBase64Image = eventData.map(event => ({
-            ...event,
-            image: arrayBufferToBase64(event.image.buffer),
-          }));
-          setEventList(eventsWithBase64Image);
+          setEventList(eventData);
         }
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -33,17 +26,6 @@ const Events = ({ userEmail }) => {
 
     fetchEvents();
   }, []);
-
-  // Function to convert ArrayBuffer to Base64 string
-  const arrayBufferToBase64 = (buffer) => {
-    let binary = "";
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return window.btoa(binary);
-  };
 
   return (
     <div className="bg-black min-h-screen py-10 px-5 poppins-font" style={bg}>
@@ -60,7 +42,7 @@ const Events = ({ userEmail }) => {
               <div className="p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-3">{event.name}</h2>
                 <p className="text-gray-700 mb-3">Location: {event.location}</p>
-                <p className="text-gray-700 mb-3">Total Tickets: {event.totaltickets}</p>
+                <p className="text-gray-700 mb-3">Total Tickets: {event.totalTickets}</p>
                 <p className="text-gray-700 mb-3">Event Time: {event.time}</p>  
                 <h2 className="mb-2 text-2xl font-semibold">{userEmail}</h2>
                 <Link
@@ -78,7 +60,7 @@ const Events = ({ userEmail }) => {
             </div>
           ))
         ) : (
-          <p className="text-white text-center">Loading events...</p>
+          <p className="text-white text-cente r">Loading events...</p>
         )}
       </div>
     </div>

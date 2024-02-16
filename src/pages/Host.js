@@ -57,7 +57,7 @@ const Host = ({ userEmail }) => {
   
       // Get the user's email
       const userEmail = currentUser.email;
-      console.log("User email:", userEmail); 
+      console.log("User email:", userEmail);
   
       // Get the ID token (Bearer token)
       const idToken = await currentUser.getIdToken();
@@ -67,20 +67,21 @@ const Host = ({ userEmail }) => {
         Authorization: `Bearer ${idToken}`
       };
   
-      // Make the HTTP request with the headers
+      // Create a FormData object to send the event data
       const formData = new FormData();
       formData.append("image", host.image);
       formData.append("name", host.name);
       formData.append("location", host.location);
-      formData.append("totaltickets", host.totaltickets);
+      formData.append("totalTickets", host.totaltickets); // Corrected property name
       formData.append("price", host.price);
       formData.append("date", host.date);
       formData.append("time", host.time);
       formData.append("email", userEmail);
   
+      // Make the HTTP request with the headers and FormData
       const response = await fetch("http://localhost:5000/api/host", {
         method: "POST",
-        headers: headers, // Include the Authorization header
+        headers: headers,
         body: formData,
       });
   
@@ -89,7 +90,7 @@ const Host = ({ userEmail }) => {
         setHost({
           name: "",
           location: "",
-          totaltickets: "",
+          totaltickets: "", // Corrected property name
           price: "",
           date: "",
           time: "",
@@ -103,6 +104,7 @@ const Host = ({ userEmail }) => {
       setTransactionStatus("Hosting failed. Please try again.");
     }
   };
+  
   
   return (
     <div className="poppins-font bg-black h-full flex-col px-60 py-11  text-white font-medium" style={bg}>

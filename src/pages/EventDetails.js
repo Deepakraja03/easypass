@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import img from '../assets/photo-1522327646852-4e28586a40dd.avif';
 import { getAuth } from "firebase/auth";
+import { useParams, useLocation } from "react-router-dom";
 
 const bg = {
     backgroundImage: `url(${img})`,
@@ -9,9 +9,11 @@ const bg = {
 };
 
 const EventDetails = () => {
-    const [event, setEvent] = useState(null);
-    const [userEmail, setUserEmail] = useState(null);
     const { id } = useParams();
+    const location = useLocation();
+    const userEmailParam = new URLSearchParams(location.search).get("userEmail");
+    const [userEmail, setUserEmail] = useState(userEmailParam); // Initialize userEmail with the parameter value
+    const [event, setEvent] = useState(null);
     const [transactionStatus, setTransactionStatus] = useState(null);
     const [confirmation, setConfirmation] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -19,19 +21,24 @@ const EventDetails = () => {
     const [alreadyBooked, setAlreadyBooked] = useState(false);
 
     useEffect(() => {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        console.log("USER EMAIL IS ", user?.email);
-        if (user) {
-            setUserEmail(user.email);
-        } else {
-            console.log("User is not signed in");
-        }
-        
+        const fetchUserDetails = async () => {
+            const auth = getAuth();
+            const user = auth.currentUser;
+            console.log("USER EMAIL IS ", user?.email);
+            if (user) {
+                setUserEmail(user.email);
+            } else {
+                console.log("User is not signed in");
+            }
+        };
+
+        fetchUserDetails();
+
         const fetchEventDetails = async () => {
             try {
                 const response = await fetch(`http://localhost:5000/api/events/${id}`);
                 if (response.ok) {
+                    console.log(response);
                     const eventData = await response.json();
                     setEvent(eventData);
                     if (eventData.bookedBy.includes(userEmail)) {
@@ -49,7 +56,6 @@ const EventDetails = () => {
 
     const bookTicket = async () => {
         if (!userEmail) {
-            // Handle the case where user email is not available (user is not signed in)
             console.log("User is not signed in");
             return;
         }
@@ -64,38 +70,40 @@ const EventDetails = () => {
         }
     };
     
-    const handleConfirmation = async () => {
-        setShowModal(false);
-        setConfirmation(false);
-    
-        try {
-            const response = await fetch(`http://localhost:5000/api/events/${id}/book`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    userEmail: userEmail
-                })
-            });
-            console.log(userEmail);
-            if (response.ok) {
-                const data = await response.json();
-                if (data.message === "Ticket booked successfully") {
-                    setTransactionStatus("Ticket booked successfully");
-                    setApprovalModal(true); // Open the approval popup
-                } else {
-                    setTransactionStatus(data.message);
-                    setShowModal(true);
-                }
+    // Frontend: EventDetails.js
+
+const handleConfirmation = async () => {
+    setShowModal(false);
+    setConfirmation(false);
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/events/book/${id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                userEmail: userEmail
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.message === "Ticket booked successfully") {
+                // Show ticket booked popup
+                alert("Ticket booked successfully");
             } else {
-                console.error("Failed to book ticket");
+                // Show error message
+                alert(data.message);
             }
-        } catch (error) {
-            console.error("Error booking ticket:", error);
+        } else {
+            // Handle other HTTP errors
+            console.error("Failed to book ticket:", response.statusText);
         }
-    };
-    
+    } catch (error) {
+        console.error("Error booking ticket:", error);
+    }
+};
 
     const closeApprovalModal = () => {
         setApprovalModal(false);
