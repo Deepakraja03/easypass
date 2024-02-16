@@ -1,23 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Host from './pages/Host';
+import Events from './pages/Events';
+import Dashboard from './pages/Dashboard';
 
+// import TicketBooking from '../src/Pages/TicketBooking';
+import EventDetails from './pages/EventDetails';
+import ParentComponent from './Components/ParentComponent';
+
+// import '@rainbow-me/rainbowkit/styles.css';
+// import {
+//   getDefaultWallets,
+//   RainbowKitProvider,
+// } from '@rainbow-me/rainbowkit';
+// import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+// import {avalancheFuji
+// } from 'wagmi/chains';
+
+// import { publicProvider } from 'wagmi/providers/public';
 function App() {
+  const [userEmail, setUserEmail] = useState(null);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+          <Router>
+            <ParentComponent userEmail={userEmail} setUserEmail={setUserEmail} />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/host" element={<Host />} />
+              <Route path="/Dashboard" element={<Dashboard />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/event/:id" element={<EventDetails />} />
+              {/* <Route path="/event/:id/booking" element={<TicketBooking />} /> */}
+            </Routes>
+          </Router>
     </div>
   );
 }
