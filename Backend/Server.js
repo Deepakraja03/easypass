@@ -257,7 +257,7 @@ app.post('/api/approve-request/:eventId', async (req, res) => {
       const event = await Event.findOneAndUpdate(
         { _id: eventId, totalTickets: { $gt: 0 } },
         { $push: { bookedBy: userEmail },
-          $inc: { totalTicket:-1 } },
+          $inc: { totalTickets:-1 } },
         { new: true }
       );
 
