@@ -33,7 +33,7 @@ const Events = ({ userEmail }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {eventList.length > 0 ? (
           eventList.map((event) => (
-            <div key={event._id} className="bg-gradient-to-b from-red-500 via-yellow-400 to-yellow-200 hover:from-yellow-500 hover:via-yellow-600 hover:to-red-800 rounded-lg shadow-lg">
+            <div key={event._id} className="bg-gradient-to-br from-yellow-300 via-gray-400 to-gray-200   p-2 rounded-lg shadow-lg">
               <img
                 className="w-full h-48 object-cover object-center rounded-t-lg"
                 src={`data:${event.contentType};base64,${event.image}`}
@@ -42,7 +42,7 @@ const Events = ({ userEmail }) => {
               <div className="p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-3">{event.name}</h2>
                 <p className="text-gray-700 mb-3">Location: {event.location}</p>
-                <p className="text-gray-700 mb-3">Total Tickets: {event.totalTickets}</p>
+                <p className="text-gray-700 mb-3">Available Seats: {event.totalTickets}</p>
                 <p className="text-gray-700 mb-3">Event Time: {event.time}</p>  
                 <h2 className="mb-2 text-2xl font-semibold">{userEmail}</h2>
                 <Link

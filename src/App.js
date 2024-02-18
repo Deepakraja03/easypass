@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 // import TicketBooking from '../src/Pages/TicketBooking';
 import EventDetails from './pages/EventDetails';
 import ParentComponent from './Components/ParentComponent';
+import Approval from './pages/Approval';
 
 // import '@rainbow-me/rainbowkit/styles.css';
 // import {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/Dashboard" element={<Dashboard />} />
               <Route path="/events" element={<Events />} />
               <Route path="/event/:id" element={<EventDetails />} />
+              <Route path='/Approval/:id' element={<Approval />} />
               {/* <Route path="/event/:id/booking" element={<TicketBooking />} /> */}
             </Routes>
           </Router>

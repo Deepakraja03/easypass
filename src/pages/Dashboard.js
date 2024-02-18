@@ -14,22 +14,24 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const auth = getAuth();
     const fetchData = async () => {
       try {
+        const auth = getAuth();
         const user = auth.currentUser;
         if (user) {
           const userEmail = user.email;
           const idToken = await user.getIdToken();
           console.log(userEmail);
-          const response = await fetch("api/dashboard", {
+          const response = await fetch("http://localhost:5000/api/dashboard", {
             headers: {
               Authorization: `Bearer ${idToken}`,
             },
           });
           if (response.ok) {
             const eventData = await response.json();
-            setEvents(eventData.events);
+            // Filter events based on current user's email
+            const filteredEvents = eventData.filter(event => event.hostedBy === userEmail);
+            setEvents(filteredEvents);
             setLoading(false);
           } else {
             console.error("Failed to fetch events");
@@ -41,13 +43,13 @@ const Dashboard = () => {
         console.error("Error fetching events:", error);
       }
     };
-    
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+
+    const authListener = onAuthStateChanged(getAuth(), (user) => {
       fetchData();
     });
 
     return () => {
-      unsubscribe();
+      authListener();
     };
   }, []);
 
@@ -71,20 +73,18 @@ const Dashboard = () => {
                           </h5>
                         </Link>
                         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Event Location<br />{event.location}</p>
-                        <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Total Tickets<br />{event.totaltickets}</p>
+                        <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Total Tickets<br />{event.totalTickets}</p>
                         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Price<br />{event.price}</p>
                         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Date<br />{event.date}</p>
                         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Time<br />{event.time}</p>
                         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Hosted By<br />{event.hostedBy}</p>
 
-                        {showDetails ? (
-                          <div>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">Booked By<br />{event.bookedBy.join(', ')}</p>
-                            <button onClick={() => setShowDetails(false)}>Hide Details</button>
-                          </div>
-                        ) : (
-                          <button onClick={() => setShowDetails(true)}>Show Details</button>
-                        )}
+                        <Link
+                          to={`/approval/${event._id}`}
+                          className="text-black bg-yellow-300 py-1 px-2 rounded-lg"
+                        >
+                          Show Details
+                        </Link>
                       </div>
                     </div>
                   </div>
