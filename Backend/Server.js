@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Firebase Admin SDK initialization
-const serviceAccount = require("../ticket2-b1147-firebase-adminsdk-93xxm-5626a22e27.json"); // Update with your service account key path
+const serviceAccount = require("./ticket2-b1147-firebase-adminsdk-93xxm-5626a22e27.json"); // Update with your service account key path
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
